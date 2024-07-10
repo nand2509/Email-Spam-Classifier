@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Spam Classifier</title>
+    <style>
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        h1 {
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: .15em solid orange;
+            width: 18ch;
+            animation: typing 4s steps(18, end), blink .75s step-end infinite;
+        }
+
+        form {
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        textarea {
+            width: 100%;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .spam {
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px #000;
+        }
+
+        .not-spam {
+            color: green;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px #000;
+        }
+
+        .email-container {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            text-align: left;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .email-content {
+            margin: 10px 0;
+            color: #ddd;
+        }
+
+        .email-date {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                padding: 15px;
+            }
+
+            textarea {
+                font-size: 14px;
+            }
+
+            button,
+            a {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Email Spam Classifier</h1>
+    <div>
+        <form method="post" action="/predict">
+            <textarea rows="12" cols="60" name="content" placeholder="Enter your email here" autocomplete="off"></textarea>
+            <div class="buttons">
+                <button type="submit">Classify</button>
+                <a href="/">Reset</a>
+            </div>
+        </form>
+    </div>
+    <div class="result">
+        {% if prediction %}
+        {% if prediction == 1 %}
+        <h2 class="spam">Spam</h2>
+        {% else %}
+        <h2 class="not-spam">Not Spam</h2>
+        {% endif %}
+        {% endif %}
+    </div>
+    <div>
+        {% for email in emails %}
+        <div class="email-container">
+            <div class="email-header">
+                <strong>Email ID: {{ email.id }}</strong>
+                <span class="email-date">{{ email.date }}</span>
+            </div>
+            <div class="email-content">{{ email.content }}</div>
+            <div class="result">
+                {% if email.prediction == 1 %}
+                <h2 class="spam">Spam</h2>
+                {% else %}
+                <h2 class="not-spam">Not Spam</h2>
+                {% endif %}
+            </div>
+            <form method="post" action="/delete/{{ email.id }}" style="display:inline;">
+                <button type="submit" style="background-color:red;">Delete</button>
+            </form>
+            <form method="post" action="/modify/{{ email.id }}" style="display:inline;">
+                <textarea name="new_content" placeholder="Modify content">{{ email.content }}</textarea>
+                <button type="submit" style="background-color:orange;">Modify</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
